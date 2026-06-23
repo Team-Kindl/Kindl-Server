@@ -45,6 +45,12 @@ dependencies {
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
 
+    // Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
