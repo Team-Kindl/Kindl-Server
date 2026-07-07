@@ -20,4 +20,9 @@ enum class ErrorCode(
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "ETK", "만료된 토큰입니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "ITK", "유효하지 않은 토큰입니다."),
     INVALID_TOKEN_TYPE(HttpStatus.UNAUTHORIZED, "ITT", "토큰 타입이 올바르지 않습니다."),
+
+    /* ========== OAuth ========== */
+    INVALID_OAUTH_TOKEN(HttpStatus.UNAUTHORIZED, "IOT", "유효하지 않은 소셜 로그인 토큰입니다."),
+    UNSUPPORTED_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "UOP", "지원하지 않는 소셜 로그인 제공자입니다."),
+    REGISTRATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "RNF", "가입 정보가 만료되었거나 유효하지 않습니다. 다시 로그인해 주세요."),
 }
