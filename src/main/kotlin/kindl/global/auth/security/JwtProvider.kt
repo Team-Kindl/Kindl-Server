@@ -18,33 +18,37 @@ class JwtProvider(
     private val jwtGenerator: JwtGenerator,
     private val jwtValidator: JwtValidator,
 ) {
-    fun issueToken(userId: String, roles: List<String> = emptyList()): TokenDto {
-        val access = jwtGenerator.generateAccessToken(userId, roles)
-        val refresh = jwtGenerator.generateRefreshToken(userId)
-        return TokenDto.of(
-            accessToken = access.token,
-            accessTokenExpiredAt = access.expiredAt,
-            refreshToken = refresh.token,
-            refreshTokenExpiredAt = refresh.expiredAt,
+    fun issueToken(userId: String, userRoles: List<String> = emptyList()): TokenDto {
+        val accessToken = jwtGenerator.generateAccessToken(userId, userRoles)
+        val refreshToken = jwtGenerator.generateRefreshToken(userId)
+        return TokenDto.of(accessToken, refreshToken)
+    }
+
+    fun getAuthentication(encodedToken: String): Authentication {
+        val tokenClaims = jwtValidator.parse(encodedToken)
+
+        if (tokenClaims[TYPE_KEY] != TokenType.ACCESS_TOKEN.name) {
+            throw CustomException(ErrorCode.INVALID_TOKEN_TYPE)
+        }
+        val userId = tokenClaims.subject ?: throw CustomException(ErrorCode.INVALID_TOKEN)
+
+        val userRoles = parseUserRoles(tokenClaims[ROLES_KEY])
+        val grantedAuthorities = userRoles.map { userRole -> SimpleGrantedAuthority(ROLE_PREFIX + userRole) }
+
+        return UsernamePasswordAuthenticationToken.authenticated(
+            CustomUserDetails(userId, grantedAuthorities),
+            null,
+            grantedAuthorities,
         )
     }
 
-    fun getAuthentication(token: String): Authentication {
-        val claims = jwtValidator.parse(token)
-
-        if (claims[TYPE_KEY] != TokenType.ACCESS_TOKEN.name) {
-            throw CustomException(ErrorCode.INVALID_TOKEN_TYPE)
+    private fun parseUserRoles(rolesClaim: Any?): List<String> = when (rolesClaim) {
+        null -> emptyList()
+        is Collection<*> -> rolesClaim.map { userRole ->
+            (userRole as? String)?.takeIf { roleName -> roleName.isNotBlank() }
+                ?: throw CustomException(ErrorCode.INVALID_TOKEN)
         }
-        val subject = claims.subject ?: throw CustomException(ErrorCode.INVALID_TOKEN)
-
-        val roles = claims[ROLES_KEY] as? List<*> ?: emptyList<Any?>()
-        val authorities = roles.map { SimpleGrantedAuthority(ROLE_PREFIX + it) }
-
-        return UsernamePasswordAuthenticationToken(
-            CustomUserDetails(subject, authorities),
-            null,
-            authorities,
-        )
+        else -> throw CustomException(ErrorCode.INVALID_TOKEN)
     }
 
     companion object {

@@ -3,7 +3,8 @@ package kindl.global.response
 import kindl.global.exception.ErrorCode
 import org.springframework.http.ResponseEntity
 
-data class FailureResponse(
+@ConsistentCopyVisibility
+data class FailureResponse private constructor(
     override val status: Int,
     override val code: String,
     override val message: String,
@@ -11,12 +12,12 @@ data class FailureResponse(
     companion object {
         fun of(
             errorCode: ErrorCode,
-        ) = of(errorCode, errorCode.message)
+        ): ResponseEntity<FailureResponse> = of(errorCode, errorCode.message)
 
         fun of(
             errorCode: ErrorCode,
             message: String,
-        ) = ResponseEntity
+        ): ResponseEntity<FailureResponse> = ResponseEntity
             .status(errorCode.httpStatus)
             .body(
                 FailureResponse(
