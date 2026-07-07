@@ -1,10 +1,10 @@
 package kindl.global.auth.security
 
+import kindl.global.auth.jwt.dto.response.TokenResponse
 import kindl.global.auth.jwt.JwtGenerator
 import kindl.global.auth.jwt.JwtGenerator.Companion.ROLES_KEY
 import kindl.global.auth.jwt.JwtGenerator.Companion.TYPE_KEY
 import kindl.global.auth.jwt.JwtValidator
-import kindl.global.auth.jwt.TokenDto
 import kindl.global.auth.jwt.TokenType
 import kindl.global.exception.CustomException
 import kindl.global.exception.ErrorCode
@@ -18,10 +18,10 @@ class JwtProvider(
     private val jwtGenerator: JwtGenerator,
     private val jwtValidator: JwtValidator,
 ) {
-    fun issueToken(userId: String, userRoles: List<String> = emptyList()): TokenDto {
+    fun issueToken(userId: String, userRoles: List<String> = emptyList()): TokenResponse {
         val accessToken = jwtGenerator.generateAccessToken(userId, userRoles)
         val refreshToken = jwtGenerator.generateRefreshToken(userId)
-        return TokenDto.of(accessToken, refreshToken)
+        return TokenResponse.of(accessToken, refreshToken)
     }
 
     fun getAuthentication(encodedToken: String): Authentication {

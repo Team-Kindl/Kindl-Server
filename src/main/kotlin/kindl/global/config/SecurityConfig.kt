@@ -1,10 +1,10 @@
 package kindl.global.config
 
 import kindl.global.auth.jwt.JwtProperties
-import kindl.global.auth.security.JwtProvider
 import kindl.global.auth.security.JwtAccessDeniedHandler
 import kindl.global.auth.security.JwtAuthenticationEntryPoint
 import kindl.global.auth.security.JwtAuthenticationFilter
+import kindl.global.auth.security.JwtProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

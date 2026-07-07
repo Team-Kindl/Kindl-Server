@@ -99,7 +99,7 @@ tasks.register<Test>("googleLoginE2e") {
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     filter {
-        includeTestsMatching("kindl.global.auth.oauth.GoogleLoginE2ETest")
+        includeTestsMatching("kindl.domain.auth.e2e.GoogleLoginE2ETest")
     }
     systemProperty("kindl.google-e2e.enabled", "true")
     testLogging {
@@ -116,7 +116,7 @@ tasks.register<Test>("kakaoLoginE2e") {
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     filter {
-        includeTestsMatching("kindl.global.auth.oauth.KakaoLoginE2ETest")
+        includeTestsMatching("kindl.domain.auth.e2e.KakaoLoginE2ETest")
     }
     systemProperty("kindl.kakao-e2e.enabled", "true")
     testLogging {
