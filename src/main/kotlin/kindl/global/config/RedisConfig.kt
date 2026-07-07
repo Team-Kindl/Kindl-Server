@@ -11,13 +11,13 @@ class RedisConfig {
 
     @Bean
     fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
-        val serializer = StringRedisSerializer()
-        val template = RedisTemplate<String, String>()
-        template.connectionFactory = connectionFactory
-        template.keySerializer = serializer
-        template.valueSerializer = serializer
-        template.hashKeySerializer = serializer
-        template.hashValueSerializer = serializer
-        return template
+        val stringRedisSerializer = StringRedisSerializer()
+        val configuredRedisTemplate = RedisTemplate<String, String>()
+        configuredRedisTemplate.connectionFactory = connectionFactory
+        configuredRedisTemplate.keySerializer = stringRedisSerializer
+        configuredRedisTemplate.valueSerializer = stringRedisSerializer
+        configuredRedisTemplate.hashKeySerializer = stringRedisSerializer
+        configuredRedisTemplate.hashValueSerializer = stringRedisSerializer
+        return configuredRedisTemplate
     }
 }
