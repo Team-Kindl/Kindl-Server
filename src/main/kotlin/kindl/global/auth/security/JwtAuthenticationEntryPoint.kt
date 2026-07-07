@@ -13,7 +13,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver
 @Component
 class JwtAuthenticationEntryPoint(
     @param:Qualifier("handlerExceptionResolver")
-    private val resolver: HandlerExceptionResolver,
+    private val handlerExceptionResolver: HandlerExceptionResolver,
 ) : AuthenticationEntryPoint {
 
     override fun commence(
@@ -23,7 +23,7 @@ class JwtAuthenticationEntryPoint(
     ) {
         val exception = request.getAttribute(EXCEPTION_KEY) as? Exception
             ?: CustomException(ErrorCode.UNAUTHORIZED)
-        resolver.resolveException(request, response, null, exception)
+        handlerExceptionResolver.resolveException(request, response, null, exception)
     }
 
     companion object {

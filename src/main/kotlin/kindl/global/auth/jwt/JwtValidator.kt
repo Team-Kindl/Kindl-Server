@@ -11,18 +11,18 @@ import org.springframework.stereotype.Component
 class JwtValidator(
     private val keyProvider: KeyProvider,
 ) {
-    fun parse(token: String) =
+    fun parse(encodedToken: String) =
         try {
             Jwts.parser()
                 .verifyWith(keyProvider.getSigningKey())
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(encodedToken)
                 .payload
-        } catch (e: ExpiredJwtException) {
+        } catch (expiredJwtException: ExpiredJwtException) {
             throw CustomException(ErrorCode.EXPIRED_TOKEN)
-        } catch (e: JwtException) {
+        } catch (jwtException: JwtException) {
             throw CustomException(ErrorCode.INVALID_TOKEN)
-        } catch (e: IllegalArgumentException) {
+        } catch (illegalArgumentException: IllegalArgumentException) {
             throw CustomException(ErrorCode.INVALID_TOKEN)
         }
 }

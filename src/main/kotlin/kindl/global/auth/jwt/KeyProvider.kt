@@ -12,5 +12,5 @@ class KeyProvider(
     private val signingKey: SecretKey =
         Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray(StandardCharsets.UTF_8))
 
-    fun getSigningKey() = signingKey
+    fun getSigningKey(): SecretKey = signingKey
 }

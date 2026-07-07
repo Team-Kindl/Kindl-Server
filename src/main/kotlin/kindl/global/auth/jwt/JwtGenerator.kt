@@ -1,6 +1,7 @@
 package kindl.global.auth.jwt
 
 import io.jsonwebtoken.Jwts
+import kindl.global.auth.jwt.dto.response.TokenResponse
 import org.springframework.stereotype.Component
 import java.util.Date
 
@@ -9,30 +10,33 @@ class JwtGenerator(
     private val jwtProperties: JwtProperties,
     private val keyProvider: KeyProvider,
 ) {
-    fun generateAccessToken(userId: String, roles: List<String>) =
-        build(userId, TokenType.ACCESS_TOKEN, jwtProperties.accessTokenExpireTime, roles)
+    fun generateAccessToken(userId: String, userRoles: List<String>): TokenResponse.TokenDetailResponse =
+        build(userId, TokenType.ACCESS_TOKEN, jwtProperties.accessTokenExpireTime, userRoles)
 
-    fun generateRefreshToken(userId: String) =
+    fun generateRefreshToken(userId: String): TokenResponse.TokenDetailResponse =
         build(userId, TokenType.REFRESH_TOKEN, jwtProperties.refreshTokenExpireTime, null)
 
     private fun build(
         userId: String,
-        type: TokenType,
-        ttlMillis: Long,
-        roles: List<String>?,
-    ): TokenDto.Token {
-        val now = System.currentTimeMillis()
-        val expiredAt = now + ttlMillis
-        val builder = Jwts.builder()
+        tokenType: TokenType,
+        timeToLiveMillis: Long,
+        userRoles: List<String>?,
+    ): TokenResponse.TokenDetailResponse {
+        val issuedAtMillis = System.currentTimeMillis()
+        val expirationAtMillis = issuedAtMillis + timeToLiveMillis
+        val jwtBuilder = Jwts.builder()
             .subject(userId)
-            .claim(TYPE_KEY, type.name)
-            .issuedAt(Date(now))
-            .expiration(Date(expiredAt))
+            .claim(TYPE_KEY, tokenType.name)
+            .issuedAt(Date(issuedAtMillis))
+            .expiration(Date(expirationAtMillis))
             .signWith(keyProvider.getSigningKey())
-        if (roles != null) {
-            builder.claim(ROLES_KEY, roles)
+        if (userRoles != null) {
+            jwtBuilder.claim(ROLES_KEY, userRoles)
         }
-        return TokenDto.Token(builder.compact(), expiredAt)
+        return TokenResponse.TokenDetailResponse.of(
+            token = jwtBuilder.compact(),
+            expiredAt = expirationAtMillis,
+        )
     }
 
     companion object {

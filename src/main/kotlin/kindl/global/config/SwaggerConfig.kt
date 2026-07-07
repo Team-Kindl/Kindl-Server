@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
-import io.swagger.v3.oas.models.servers.Server
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -14,7 +13,7 @@ class SwaggerConfig {
 
     @Bean
     fun openAPI(): OpenAPI {
-        val bearerAuth = SecurityScheme()
+        val bearerAuthenticationScheme = SecurityScheme()
             .type(SecurityScheme.Type.HTTP)
             .scheme("bearer")
             .bearerFormat("JWT")
@@ -28,8 +27,7 @@ class SwaggerConfig {
                     .description("Kindl 서버 API 문서. 토큰 입력 시 'Bearer ' 제외하고 입력하세요.")
                     .version("v1"),
             )
-            .servers(listOf(Server().url("http://localhost:8080").description("Local")))
-            .components(Components().addSecuritySchemes(SECURITY_SCHEME_NAME, bearerAuth))
+            .components(Components().addSecuritySchemes(SECURITY_SCHEME_NAME, bearerAuthenticationScheme))
             .addSecurityItem(SecurityRequirement().addList(SECURITY_SCHEME_NAME))
     }
 

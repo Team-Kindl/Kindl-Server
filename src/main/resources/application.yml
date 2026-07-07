@@ -1,4 +1,5 @@
 spring:
   application:
     name: kindl
-
+  jackson:
+    time-zone: UTC

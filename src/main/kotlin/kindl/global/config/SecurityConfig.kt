@@ -1,10 +1,10 @@
 package kindl.global.config
 
 import kindl.global.auth.jwt.JwtProperties
-import kindl.global.auth.security.JwtProvider
 import kindl.global.auth.security.JwtAccessDeniedHandler
 import kindl.global.auth.security.JwtAuthenticationEntryPoint
 import kindl.global.auth.security.JwtAuthenticationFilter
+import kindl.global.auth.security.JwtProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,7 +34,7 @@ class SecurityConfig(
             csrf { disable() }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             authorizeHttpRequests {
-                PERMIT_ALL.forEach { authorize(it, permitAll) }
+                PUBLIC_ENDPOINTS.forEach { publicEndpoint -> authorize(publicEndpoint, permitAll) }
                 authorize(anyRequest, authenticated)
             }
             exceptionHandling {
@@ -50,12 +50,15 @@ class SecurityConfig(
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     companion object {
-        private val PERMIT_ALL = arrayOf(
+        private val PUBLIC_ENDPOINTS = arrayOf(
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/v3/api-docs.yaml",
-            "/actuator/**",
+            "/actuator/health",
+            "/actuator/health/**",
+            "/api/v1/auth/login/**",
+            "/api/v1/auth/signup",
         )
     }
 }
