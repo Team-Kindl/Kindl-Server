@@ -1,0 +1,11 @@
+spring:
+  flyway:
+    enabled: true
+
+kindl:
+  jwt:
+    access-key: test-access-key-for-testing-only-min-32-bytes
+    signup-key: test-signup-key-for-testing-only-min-32-bytes
+  # 실제 OIDC 검증기 대신 FakeSocialTokenVerifier를 쓴다
+  oauth:
+    enabled: false
