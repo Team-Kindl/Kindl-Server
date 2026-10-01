@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: kindl
+  config:
+    import:
+      - classpath:storage.yml
+      - classpath:security.yml
+      - classpath:external.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  messages:
+    basename: messages
+    # 서버 OS 로케일이 아니라 messages.properties(en)로 떨어진다
+    fallback-to-system-locale: false
+  jackson:
+    time-zone: UTC
+
+server:
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 50
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

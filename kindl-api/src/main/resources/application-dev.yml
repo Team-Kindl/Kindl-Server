@@ -1,0 +1,8 @@
+spring:
+  flyway:
+    enabled: ${FLYWAY_ON_STARTUP:true}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true

@@ -1,0 +1,10 @@
+kindl:
+  jwt:
+    issuer: kindl
+    access-key: ${JWT_ACCESS_KEY}
+    signup-key: ${JWT_SIGNUP_KEY}
+    access-ttl: 30m
+    signup-ttl: 10m
+    refresh-ttl: 30d
+    refresh-reuse-grace: 10s
+    clock-skew: 30s

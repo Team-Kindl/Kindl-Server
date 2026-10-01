@@ -1,0 +1,19 @@
+# 로컬 전용. 비밀값은 .env에서 읽는다. 서버는 IDE에서 local 프로필로 띄운다
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: kindl
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci", "--default-time-zone=+00:00"]
+    ports: ["3306:3306"]
+    volumes: ["mysql-data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  mysql-data:
