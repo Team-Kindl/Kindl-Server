@@ -14,6 +14,8 @@ import java.time.Instant
 
 /**
  * 앱 설치 하나. installationId는 설치마다 앱이 만든 UUID다.
+ * 기기별 로그아웃(refresh token 묶음)과 푸시 토큰 등록의 기준이다.
+ * 권한 상태(알림·카메라)는 서버가 쓰는 곳이 없어 저장하지 않는다. 알림 권한은 푸시 토큰 등록 때 함께 받는다.
  */
 @Entity
 @Table(name = "devices")
@@ -48,16 +50,6 @@ class Device private constructor(
     var appVersion: String = spec.appVersion
         protected set
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    var notificationPermission: PermissionStatus = spec.notificationPermission
-        protected set
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    var cameraPermission: PermissionStatus = spec.cameraPermission
-        protected set
-
     // 3단계
     @Column(length = 255)
     var pushToken: String? = null
@@ -71,8 +63,6 @@ class Device private constructor(
         platform = spec.platform
         osVersion = spec.osVersion
         appVersion = spec.appVersion
-        notificationPermission = spec.notificationPermission
-        cameraPermission = spec.cameraPermission
         lastSeenAt = now
     }
 
@@ -86,6 +76,4 @@ data class DeviceSpec(
     val platform: Platform,
     val osVersion: String,
     val appVersion: String,
-    val notificationPermission: PermissionStatus,
-    val cameraPermission: PermissionStatus,
 )

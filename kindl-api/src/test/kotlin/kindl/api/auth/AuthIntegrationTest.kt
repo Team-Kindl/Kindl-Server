@@ -34,8 +34,7 @@ class AuthIntegrationTest(
 ) : DescribeSpec({
 
     val device = """
-        {"installationId":"install-1","platform":"IOS","osVersion":"18.0","appVersion":"1.0.0",
-         "notificationPermission":"GRANTED","cameraPermission":"NOT_DETERMINED"}
+        {"installationId":"install-1","platform":"IOS","osVersion":"18.0","appVersion":"1.0.0"}
     """.trimIndent()
 
     fun login(socialToken: String, provider: String = "kakao"): ResultActions = mockMvc.perform(

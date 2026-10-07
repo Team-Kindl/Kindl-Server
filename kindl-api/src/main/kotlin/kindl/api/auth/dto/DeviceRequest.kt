@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size
 import kindl.core.type.Platform
 import kindl.domain.user.command.DeviceCommand
 import kindl.domain.user.entity.DeviceSpec
-import kindl.domain.user.entity.PermissionStatus
 
 /**
  * 필수 필드를 nullable로 받는다: non-null이면 필드가 빠진 JSON에서 검증보다 역직렬화 예외가 먼저 나
@@ -21,13 +20,9 @@ data class DeviceRequest(
     val osVersion: String?,
     @field:NotBlank @field:Size(max = 20)
     val appVersion: String?,
-    @field:NotNull
-    val notificationPermission: PermissionStatus?,
-    @field:NotNull
-    val cameraPermission: PermissionStatus?,
 ) {
     fun toCommand() = DeviceCommand(
         installationId = installationId!!,
-        spec = DeviceSpec(platform!!, osVersion!!, appVersion!!, notificationPermission!!, cameraPermission!!),
+        spec = DeviceSpec(platform!!, osVersion!!, appVersion!!),
     )
 }

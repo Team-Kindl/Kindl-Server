@@ -35,8 +35,6 @@ CREATE TABLE devices (
     platform                VARCHAR(20)  NOT NULL,
     os_version              VARCHAR(20)  NOT NULL,
     app_version             VARCHAR(20)  NOT NULL,
-    notification_permission VARCHAR(20)  NOT NULL,
-    camera_permission       VARCHAR(20)  NOT NULL,
     push_token              VARCHAR(255) NULL COMMENT '3단계',
     last_seen_at            DATETIME(6)  NOT NULL,
     created_at              DATETIME(6)  NOT NULL,
