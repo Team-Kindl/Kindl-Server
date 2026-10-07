@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/kindl}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 10
+      connection-timeout: 3000
+      max-lifetime: 1800000
+      # URL에 빠뜨려도 세션 시간대와 INSERT 배치가 적용되게 드라이버 옵션으로 고정한다
+      data-source-properties:
+        connectionTimeZone: UTC
+        forceConnectionTimeZoneToSession: true
+        rewriteBatchedStatements: true
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  transaction:
+    default-timeout: 5s
+
+  # 스키마는 Flyway만 바꾼다. prod는 배포와 분리된 단계에서 실행한다
+  flyway:
+    enabled: ${FLYWAY_ON_STARTUP:false}

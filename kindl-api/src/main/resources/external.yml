@@ -1,0 +1,10 @@
+kindl:
+  oauth:
+    connect-timeout: 1s
+    read-timeout: 3s
+    google:
+      client-ids: ${GOOGLE_CLIENT_IDS:}
+    kakao:
+      client-ids: ${KAKAO_CLIENT_IDS:}
+    apple:
+      client-ids: ${APPLE_CLIENT_IDS:}
