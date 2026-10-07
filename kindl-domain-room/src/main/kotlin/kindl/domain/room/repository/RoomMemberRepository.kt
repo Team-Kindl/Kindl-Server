@@ -5,15 +5,13 @@ import kindl.domain.room.enums.RoomStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
-interface RoomMemberRepository : JpaRepository<RoomMember, Long> {
+interface RoomMemberRepository : JpaRepository<RoomMember, Long>, RoomMemberRepositoryCustom {
 
     fun findByRoomIdAndUserId(roomId: String, userId: String): RoomMember?
 
     fun existsByRoomIdAndUserId(roomId: String, userId: String): Boolean
 
     fun findAllByRoomIdOrderByJoinedAtAsc(roomId: String): List<RoomMember>
-
-    fun findAllByUserId(userId: String): List<RoomMember>
 
     // 참여 모임 10개 제한은 진행 중 모임만 센다
     @Query(

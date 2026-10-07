@@ -31,13 +31,8 @@ class RoomQueryService(
     private val members: RoomMemberRepository,
     private val bans: RoomBanRepository,
 ) {
-    fun myRooms(userId: String): List<MyRoomResult> {
-        val myMemberships = members.findAllByUserId(userId).associateBy { it.roomId }
-        return rooms.findAllById(myMemberships.keys).map { room ->
-            val member = myMemberships.getValue(requireNotNull(room.id))
-            MyRoomResult(RoomResult.from(room), member.role, member.joinedAt, member.lastVerifiedAt)
-        }
-    }
+    fun myRooms(userId: String): List<MyRoomResult> =
+        members.findMyRooms(userId).map(MyRoomResult::from)
 
     fun detail(roomId: String, userId: String): RoomDetailResult {
         val room = rooms.findByIdOrNull(roomId).orThrow(CommonError.RESOURCE_NOT_FOUND)

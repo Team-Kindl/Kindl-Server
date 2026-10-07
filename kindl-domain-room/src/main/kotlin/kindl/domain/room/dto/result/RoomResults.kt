@@ -1,6 +1,7 @@
 package kindl.domain.room.dto.result
 
 import kindl.domain.room.enums.MemberRole
+import kindl.domain.room.dto.projection.MyRoomProjection
 import kindl.domain.room.entity.Room
 import kindl.domain.room.entity.RoomMember
 import kindl.domain.room.enums.RoomStatus
@@ -48,7 +49,26 @@ data class MyRoomResult(
     val myRole: MemberRole,
     val joinedAt: Instant,
     val lastVerifiedAt: Instant?,
-)
+) {
+    companion object {
+        fun from(row: MyRoomProjection) = MyRoomResult(
+            room = RoomResult(
+                roomId = row.roomId,
+                name = row.name,
+                imageFileId = row.imageFileId,
+                inviteCode = row.inviteCode,
+                ownerUserId = row.ownerUserId,
+                status = row.status,
+                memberCount = row.memberCount,
+                capacity = Room.CAPACITY,
+                endedAt = row.endedAt,
+            ),
+            myRole = row.myRole,
+            joinedAt = row.joinedAt,
+            lastVerifiedAt = row.lastVerifiedAt,
+        )
+    }
+}
 
 data class RoomDetailResult(
     val room: RoomResult,
