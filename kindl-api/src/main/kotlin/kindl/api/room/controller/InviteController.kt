@@ -1,9 +1,10 @@
-package kindl.api.room
+package kindl.api.room.controller
 
 import kindl.api.common.ratelimit.RateLimiter
 import kindl.api.common.response.SuccessResponse
-import kindl.api.room.dto.InvitePreviewResponse
-import kindl.api.room.dto.JoinRoomResponse
+import kindl.api.room.dto.response.InvitePreviewResponse
+import kindl.api.room.dto.response.JoinRoomResponse
+import kindl.api.room.facade.RoomFacade
 import kindl.api.security.CurrentUser
 import kindl.core.time.ServiceClock
 import kindl.domain.room.service.RoomService

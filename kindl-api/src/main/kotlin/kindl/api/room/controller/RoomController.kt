@@ -1,14 +1,16 @@
-package kindl.api.room
+package kindl.api.room.controller
 
 import jakarta.validation.Valid
+import java.util.UUID
 import kindl.api.common.response.SuccessResponse
-import kindl.api.room.dto.CreateRoomRequest
-import kindl.api.room.dto.EndRoomResponse
-import kindl.api.room.dto.LeaveRoomResponse
-import kindl.api.room.dto.MembersResponse
-import kindl.api.room.dto.MyRoomsResponse
-import kindl.api.room.dto.RoomDetailResponse
-import kindl.api.room.dto.RoomResponse
+import kindl.api.room.dto.request.CreateRoomRequest
+import kindl.api.room.dto.response.EndRoomResponse
+import kindl.api.room.dto.response.LeaveRoomResponse
+import kindl.api.room.dto.response.MembersResponse
+import kindl.api.room.dto.response.MyRoomsResponse
+import kindl.api.room.dto.response.RoomDetailResponse
+import kindl.api.room.dto.response.RoomResponse
+import kindl.api.room.facade.RoomFacade
 import kindl.api.security.CurrentUser
 import kindl.core.time.ServiceClock
 import kindl.domain.room.enums.RoomStatus
@@ -24,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 /** 모임 하나만 다루는 요청(만들기)은 서비스를, 여러 도메인을 엮는 요청은 Facade를 부른다 */
 @RestController

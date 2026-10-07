@@ -1,28 +1,28 @@
 package kindl.domain.room.service
 
+import java.time.Instant
 import kindl.core.error.CommonError
 import kindl.core.error.KindlException
-import kindl.domain.room.command.CreateRoomCommand
-import kindl.domain.room.enums.MemberRole
+import kindl.domain.room.dto.command.CreateRoomCommand
+import kindl.domain.room.dto.result.InvitePreviewResult
+import kindl.domain.room.dto.result.JoinStatus
+import kindl.domain.room.dto.result.LeaveResult
+import kindl.domain.room.dto.result.MemberResult
+import kindl.domain.room.dto.result.MyRoomResult
+import kindl.domain.room.dto.result.RoomDetailResult
+import kindl.domain.room.dto.result.RoomResult
 import kindl.domain.room.entity.Room
 import kindl.domain.room.entity.RoomBan
 import kindl.domain.room.entity.RoomMember
+import kindl.domain.room.enums.MemberRole
 import kindl.domain.room.enums.RoomStatus
 import kindl.domain.room.error.RoomError
 import kindl.domain.room.repository.RoomBanRepository
 import kindl.domain.room.repository.RoomMemberRepository
 import kindl.domain.room.repository.RoomRepository
-import kindl.domain.room.result.InvitePreviewResult
-import kindl.domain.room.result.JoinStatus
-import kindl.domain.room.result.LeaveResult
-import kindl.domain.room.result.MemberResult
-import kindl.domain.room.result.MyRoomResult
-import kindl.domain.room.result.RoomDetailResult
-import kindl.domain.room.result.RoomResult
 import kindl.domain.room.vo.InviteCode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 @Service
 class RoomService(

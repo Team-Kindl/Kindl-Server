@@ -1,10 +1,10 @@
-package kindl.api.room.dto
+package kindl.api.room.dto.response
 
+import java.time.Instant
+import kindl.domain.room.dto.result.JoinStatus
+import kindl.domain.room.dto.result.RoomResult
 import kindl.domain.room.enums.MemberRole
 import kindl.domain.room.enums.RoomStatus
-import kindl.domain.room.result.JoinStatus
-import kindl.domain.room.result.RoomResult
-import java.time.Instant
 
 data class RoomResponse(
     val roomId: String,

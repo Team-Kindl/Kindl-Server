@@ -1,24 +1,24 @@
-package kindl.api.room
+package kindl.api.room.facade
 
-import kindl.api.room.dto.EndRoomResponse
-import kindl.api.room.dto.InvitePreviewResponse
-import kindl.api.room.dto.LeaveRoomResponse
-import kindl.api.room.dto.MemberResponse
-import kindl.api.room.dto.MembersResponse
-import kindl.api.room.dto.MyRoomsResponse
-import kindl.api.room.dto.RoomCardResponse
-import kindl.api.room.dto.RoomDetailResponse
-import kindl.api.room.dto.UserRef
+import java.time.Instant
+import kindl.api.room.dto.response.EndRoomResponse
+import kindl.api.room.dto.response.InvitePreviewResponse
+import kindl.api.room.dto.response.LeaveRoomResponse
+import kindl.api.room.dto.response.MemberResponse
+import kindl.api.room.dto.response.MembersResponse
+import kindl.api.room.dto.response.MyRoomsResponse
+import kindl.api.room.dto.response.RoomCardResponse
+import kindl.api.room.dto.response.RoomDetailResponse
+import kindl.api.room.dto.response.UserRef
 import kindl.core.time.ServiceClock
 import kindl.domain.promise.service.PromiseService
+import kindl.domain.room.dto.result.MyRoomResult
 import kindl.domain.room.enums.RoomStatus
-import kindl.domain.room.result.MyRoomResult
 import kindl.domain.room.service.RoomService
 import kindl.domain.user.service.UserQueryService
 import kindl.domain.verification.service.VerificationService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 /**
  * 모임 + 공약 + 인증 + 유저를 엮는 유스케이스. 도메인 서비스끼리는 서로 모른다.

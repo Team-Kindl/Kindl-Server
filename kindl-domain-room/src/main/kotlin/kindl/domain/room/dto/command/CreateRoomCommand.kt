@@ -1,4 +1,4 @@
-package kindl.domain.room.command
+package kindl.domain.room.dto.command
 
 import kindl.domain.room.vo.RoomName
 

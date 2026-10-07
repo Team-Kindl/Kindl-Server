@@ -1,4 +1,4 @@
-package kindl.domain.room.result
+package kindl.domain.room.dto.result
 
 import kindl.domain.room.enums.MemberRole
 import kindl.domain.room.entity.Room
