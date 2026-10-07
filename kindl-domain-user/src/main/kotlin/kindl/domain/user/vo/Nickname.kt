@@ -1,8 +1,8 @@
 package kindl.domain.user.vo
 
 import kindl.core.error.KindlException
+import kindl.core.text.DisplayText
 import kindl.domain.user.error.UserError
-import java.text.BreakIterator
 import java.text.Normalizer
 import java.util.Locale
 
@@ -19,12 +19,13 @@ value class Nickname private constructor(val value: String) {
     companion object {
         const val MAX_GRAPHEMES = 15
         private val BLOCKED = setOf("운영자", "관리자", "admin", "kindl", "proov")
-        private val SPACES = Regex("\\s+")
 
         fun of(raw: String): Nickname {
-            val normalized = Normalizer.normalize(raw, Normalizer.Form.NFC).trim().replace(SPACES, " ")
-            if (graphemes(normalized) !in 1..MAX_GRAPHEMES) throw KindlException(UserError.NICKNAME_LENGTH)
-            if (normalized.codePoints().anyMatch(::isForbidden)) throw KindlException(UserError.NICKNAME_INVALID_CHAR)
+            val normalized = DisplayText.normalize(raw)
+            if (DisplayText.graphemeCount(normalized, MAX_GRAPHEMES) !in 1..MAX_GRAPHEMES) {
+                throw KindlException(UserError.NICKNAME_LENGTH)
+            }
+            if (DisplayText.containsForbiddenChar(normalized)) throw KindlException(UserError.NICKNAME_INVALID_CHAR)
             val folded = keyOf(normalized)
             if (BLOCKED.any { folded.contains(it) }) throw KindlException(UserError.NICKNAME_BLOCKED)
             return Nickname(normalized)
@@ -32,30 +33,5 @@ value class Nickname private constructor(val value: String) {
 
         private fun keyOf(value: String): String =
             Normalizer.normalize(value, Normalizer.Form.NFKC).lowercase(Locale.ROOT)
-
-        // Java 20+ BreakIterator는 유니코드 확장 그래핌 클러스터 단위로 끊는다
-        private fun graphemes(value: String): Int {
-            val iterator = BreakIterator.getCharacterInstance(Locale.ROOT).apply { setText(value) }
-            var count = 0
-            while (iterator.next() != BreakIterator.DONE) {
-                if (++count > MAX_GRAPHEMES) return count
-            }
-            return count
-        }
-
-        // Character.isEmoji()는 0~9, #, *도 이모지 속성이라 쓰지 않는다
-        private fun isForbidden(codePoint: Int): Boolean =
-            Character.isExtendedPictographic(codePoint) || // 그림 문자 전체 (😀 ❤ ☀ © ® ™ …)
-                Character.isEmojiModifier(codePoint) || // 피부색 🏻~🏿
-                codePoint == 0x200D || // ZWJ: 👨‍👩‍👧 같은 결합
-                codePoint in 0xFE00..0xFE0F || // 이모지 표시 선택자 (❤️의 FE0F)
-                codePoint == 0x20E3 || // 키캡 1️⃣
-                codePoint in 0x1F1E6..0x1F1FF || // 국기를 만드는 지역 표시 문자
-                codePoint in 0xE0020..0xE007F || // 태그 문자 (지역 깃발)
-                Character.getType(codePoint).let {
-                    it == Character.CONTROL.toInt() ||
-                        it == Character.PRIVATE_USE.toInt() ||
-                        it == Character.SURROGATE.toInt()
-                }
     }
 }
