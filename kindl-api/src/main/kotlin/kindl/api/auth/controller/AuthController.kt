@@ -8,7 +8,8 @@ import kindl.api.auth.dto.response.TokenResponse
 import kindl.api.auth.facade.AuthFacade
 import kindl.api.common.response.SuccessResponse
 import kindl.api.security.CurrentUser
-import kindl.core.error.KindlException
+import kindl.core.extension.orThrow
+import kindl.core.extension.toEnumIgnoreCaseOrNull
 import kindl.core.type.SocialProvider
 import kindl.domain.auth.error.AuthError
 import org.springframework.http.ResponseEntity
@@ -29,8 +30,9 @@ class AuthController(
         @PathVariable provider: String,
         @Valid @RequestBody request: LoginRequest,
     ): ResponseEntity<SuccessResponse<LoginResponse>> {
-        val socialProvider = SocialProvider.fromPath(provider)
-            ?: throw KindlException(AuthError.SOCIAL_PROVIDER_UNSUPPORTED)
+        // 모르는 provider는 형식 오류(INVALID_INPUT)가 아니라 앱이 분기할 수 있는 전용 코드로 돌려준다
+        val socialProvider = provider.toEnumIgnoreCaseOrNull<SocialProvider>()
+            .orThrow(AuthError.SOCIAL_PROVIDER_UNSUPPORTED)
         val result = authFacade.login(socialProvider, request.idToken!!, request.device!!.toCommand())
         return SuccessResponse.of(LoginResponse.from(result))
     }

@@ -1,8 +1,9 @@
 package kindl.api.auth.dto.request
 
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import kindl.api.common.validation.ValidEnum
+import kindl.core.extension.toEnumIgnoreCase
 import kindl.core.type.Platform
 import kindl.domain.user.dto.command.DeviceCommand
 import kindl.domain.user.entity.DeviceSpec
@@ -14,8 +15,8 @@ import kindl.domain.user.entity.DeviceSpec
 data class DeviceRequest(
     @field:NotBlank @field:Size(max = 64)
     val installationId: String?,
-    @field:NotNull
-    val platform: Platform?,
+    @field:NotBlank @field:ValidEnum(Platform::class)
+    val platform: String?,
     @field:NotBlank @field:Size(max = 20)
     val osVersion: String?,
     @field:NotBlank @field:Size(max = 20)
@@ -23,6 +24,6 @@ data class DeviceRequest(
 ) {
     fun toCommand() = DeviceCommand(
         installationId = installationId!!,
-        spec = DeviceSpec(platform!!, osVersion!!, appVersion!!),
+        spec = DeviceSpec(platform!!.toEnumIgnoreCase(), osVersion!!, appVersion!!),
     )
 }
