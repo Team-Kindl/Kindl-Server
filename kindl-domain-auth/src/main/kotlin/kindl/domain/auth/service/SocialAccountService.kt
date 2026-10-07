@@ -1,9 +1,9 @@
 package kindl.domain.auth.service
 
+import kindl.domain.auth.dto.result.SocialAccountResult
 import kindl.domain.auth.entity.SocialAccount
 import kindl.domain.auth.port.SocialIdentity
 import kindl.domain.auth.repository.SocialAccountRepository
-import kindl.domain.auth.result.SocialAccountResult
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

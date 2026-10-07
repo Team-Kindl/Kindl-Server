@@ -1,17 +1,17 @@
 package kindl.domain.user.service
 
+import java.time.Instant
 import kindl.core.error.KindlException
-import kindl.domain.user.command.CreateUserCommand
+import kindl.domain.user.dto.command.CreateUserCommand
+import kindl.domain.user.dto.result.NicknameAvailability
+import kindl.domain.user.dto.result.UserResult
 import kindl.domain.user.entity.User
 import kindl.domain.user.error.UserError
 import kindl.domain.user.repository.UserRepository
-import kindl.domain.user.result.NicknameAvailability
-import kindl.domain.user.result.UserResult
 import kindl.domain.user.vo.Nickname
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 @Service
 class UserService(

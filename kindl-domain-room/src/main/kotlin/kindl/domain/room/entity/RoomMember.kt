@@ -6,10 +6,11 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
+import kindl.domain.room.enums.MemberRole
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.SQLRestriction
-import java.time.Instant
 
 /** 나갔다 다시 오면 새 행이다. */
 @Entity

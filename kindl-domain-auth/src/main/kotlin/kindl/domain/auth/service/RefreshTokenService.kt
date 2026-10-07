@@ -1,17 +1,17 @@
 package kindl.domain.auth.service
 
-import kindl.core.id.Tsids
-import kindl.domain.auth.entity.RefreshToken
-import kindl.domain.auth.repository.RefreshTokenRepository
-import kindl.domain.auth.result.IssuedRefreshToken
-import kindl.domain.auth.result.RefreshRotation
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.Base64
 import java.util.HexFormat
+import kindl.core.id.Tsids
+import kindl.domain.auth.dto.result.IssuedRefreshToken
+import kindl.domain.auth.dto.result.RefreshRotation
+import kindl.domain.auth.entity.RefreshToken
+import kindl.domain.auth.repository.RefreshTokenRepository
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * 불투명한 256비트 refresh token을 쓸 때마다 새로 바꾼다 (RFC 9700의 회전 방식).

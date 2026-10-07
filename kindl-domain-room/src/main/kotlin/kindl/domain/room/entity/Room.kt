@@ -6,7 +6,9 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
 import kindl.core.error.KindlException
+import kindl.domain.room.enums.RoomStatus
 import kindl.domain.room.error.RoomError
 import kindl.domain.room.vo.InviteCode
 import kindl.support.entity.BaseSoftDeleteEntity
@@ -14,7 +16,6 @@ import kindl.support.id.TsidId
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
-import java.time.Instant
 
 @Entity
 @Table(name = "rooms")

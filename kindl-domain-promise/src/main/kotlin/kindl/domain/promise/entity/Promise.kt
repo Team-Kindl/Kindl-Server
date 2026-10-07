@@ -7,20 +7,23 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import kindl.core.error.KindlException
 import kindl.core.type.VerificationMethod
 import kindl.domain.promise.converter.VerificationMethodsConverter
+import kindl.domain.promise.enums.CycleType
+import kindl.domain.promise.enums.PromiseStatus
+import kindl.domain.promise.enums.StopReason
 import kindl.domain.promise.error.PromiseError
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
-import java.time.Duration
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
 
 @Entity
 @Table(name = "promises")

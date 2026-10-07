@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import kindl.core.error.KindlException
+import kindl.domain.verification.enums.CheerType
 import kindl.domain.verification.error.VerificationError
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId

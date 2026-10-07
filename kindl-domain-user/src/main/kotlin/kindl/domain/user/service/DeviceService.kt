@@ -1,12 +1,12 @@
 package kindl.domain.user.service
 
-import kindl.domain.user.command.DeviceCommand
+import java.time.Instant
+import kindl.domain.user.dto.command.DeviceCommand
+import kindl.domain.user.dto.result.DeviceResult
 import kindl.domain.user.entity.Device
 import kindl.domain.user.repository.DeviceRepository
-import kindl.domain.user.result.DeviceResult
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 
 @Service
 class DeviceService(

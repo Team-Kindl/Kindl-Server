@@ -6,10 +6,12 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
+import kindl.domain.verification.enums.ReportReason
+import kindl.domain.verification.enums.ReportStatus
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.SQLRestriction
-import java.time.Instant
 
 @Entity
 @Table(name = "reports")

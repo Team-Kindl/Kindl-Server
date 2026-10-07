@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import kindl.domain.user.enums.WithdrawalReason
 import kindl.support.entity.BaseCreatedEntity
 import kindl.support.id.TsidId
 

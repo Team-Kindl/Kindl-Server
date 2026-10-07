@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import kindl.core.type.VerificationMethod
+import kindl.domain.verification.enums.ItemResult
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.SQLRestriction

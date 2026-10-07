@@ -6,13 +6,15 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
+import java.time.LocalDate
+import kindl.domain.verification.enums.AppealStatus
+import kindl.domain.verification.enums.VerificationStatus
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
-import java.time.Instant
-import java.time.LocalDate
 
 /**
  * 인증 한 건. 항목(텍스트·사진)은 verification_items에 따로 둔다.
