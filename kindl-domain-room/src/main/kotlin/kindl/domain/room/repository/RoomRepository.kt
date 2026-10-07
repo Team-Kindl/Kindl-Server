@@ -21,7 +21,8 @@ interface RoomRepository : JpaRepository<Room, String> {
 
     fun findByClientRequestId(clientRequestId: String): Room?
 
-    // 지워진 모임의 코드도 재사용하지 않으므로 soft delete 조건 없이 확인한다
-    @Query(value = "select count(*) > 0 from rooms where invite_code = :inviteCode", nativeQuery = true)
-    fun existsByInviteCodeIncludingDeleted(inviteCode: String): Boolean
+    // 지워진 모임의 코드도 재사용하지 않으므로 soft delete 조건 없이 센다.
+    // 네이티브 쿼리의 비교식은 MySQL에서 숫자로 오므로 Boolean 대신 개수로 받는다
+    @Query(value = "select count(*) from rooms where invite_code = :inviteCode", nativeQuery = true)
+    fun countByInviteCodeIncludingDeleted(inviteCode: String): Long
 }

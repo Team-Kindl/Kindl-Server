@@ -121,7 +121,7 @@ class RoomCommandService(
     private fun newInviteCode(): InviteCode {
         repeat(INVITE_CODE_ATTEMPTS) {
             val code = InviteCode.generate()
-            if (!rooms.existsByInviteCodeIncludingDeleted(code.value)) return code
+            if (rooms.countByInviteCodeIncludingDeleted(code.value) == 0L) return code
         }
         throw KindlException(CommonError.CONFLICT_STATE, "초대 코드 생성 실패")
     }
