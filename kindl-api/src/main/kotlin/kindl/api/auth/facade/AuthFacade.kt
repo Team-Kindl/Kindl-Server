@@ -12,11 +12,13 @@ import kindl.core.type.SocialProvider
 import kindl.domain.auth.dto.result.RefreshRotation
 import kindl.domain.auth.error.AuthError
 import kindl.domain.auth.service.RefreshTokenService
-import kindl.domain.auth.service.SocialAccountService
+import kindl.domain.auth.service.SocialAccountCommandService
+import kindl.domain.auth.service.SocialAccountQueryService
 import kindl.domain.auth.service.SocialTokenVerifiers
 import kindl.domain.user.dto.command.DeviceCommand
 import kindl.domain.user.service.DeviceService
-import kindl.domain.user.service.UserService
+import kindl.domain.user.service.UserCommandService
+import kindl.domain.user.service.UserQueryService
 import org.springframework.stereotype.Component
 import org.springframework.transaction.support.TransactionTemplate
 
@@ -27,9 +29,11 @@ import org.springframework.transaction.support.TransactionTemplate
 @Component
 class AuthFacade(
     private val socialTokenVerifiers: SocialTokenVerifiers,
-    private val socialAccountService: SocialAccountService,
+    private val socialAccountQueryService: SocialAccountQueryService,
+    private val socialAccountCommandService: SocialAccountCommandService,
     private val refreshTokenService: RefreshTokenService,
-    private val userService: UserService,
+    private val userQueryService: UserQueryService,
+    private val userCommandService: UserCommandService,
     private val deviceService: DeviceService,
     private val accessTokenIssuer: AccessTokenIssuer,
     private val signupTokenCodec: SignupTokenCodec,
@@ -40,7 +44,7 @@ class AuthFacade(
         val identity = socialTokenVerifiers.verify(provider, idToken)
         val now = clock.instant()
         return tx.execute {
-            val account = socialAccountService.findActive(identity)
+            val account = socialAccountQueryService.findActive(identity)
                 ?: return@execute LoginResult.SignupRequired(signupTokenCodec.issue(identity, now))
             LoginResult.SignedIn(issueTokens(account.userId, device, now))
         }!!
@@ -52,9 +56,9 @@ class AuthFacade(
         val now = clock.instant()
         return tx.execute {
             // 가입 버튼을 두 번 누른 경우. 앱은 로그인으로 다시 시도한다
-            if (socialAccountService.findActive(identity) != null) throw KindlException(AuthError.ALREADY_SIGNED_UP)
-            val user = userService.create(command.user, now)
-            socialAccountService.link(user.id, identity)
+            if (socialAccountQueryService.findActive(identity) != null) throw KindlException(AuthError.ALREADY_SIGNED_UP)
+            val user = userCommandService.create(command.user, now)
+            socialAccountCommandService.link(user.id, identity)
             issueTokens(user.id, command.device, now)
         }!!
     }
@@ -64,7 +68,7 @@ class AuthFacade(
         val now = clock.instant()
         return when (val rotation = refreshTokenService.rotate(refreshToken, now)) {
             is RefreshRotation.Rotated -> {
-                userService.requireActive(rotation.userId)
+                userQueryService.requireActive(rotation.userId)
                 AuthTokens(accessTokenIssuer.issue(rotation.userId, now), rotation.issued)
             }
             RefreshRotation.Invalid -> throw KindlException(AuthError.REFRESH_INVALID)

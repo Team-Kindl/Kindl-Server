@@ -2,7 +2,7 @@ package kindl.api.security
 
 import kindl.core.error.KindlException
 import kindl.domain.auth.error.AuthError
-import kindl.domain.user.service.UserService
+import kindl.domain.user.service.UserQueryService
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
 class CurrentUserArgumentResolver(
-    private val userService: UserService,
+    private val userQueryService: UserQueryService,
 ) : HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean =
@@ -29,6 +29,6 @@ class CurrentUserArgumentResolver(
         val authentication = SecurityContextHolder.getContext().authentication as? JwtAuthenticationToken
             ?: throw KindlException(AuthError.AUTH_REQUIRED)
         // 탈퇴·강퇴는 access 만료를 기다리지 않고 매 요청 막는다
-        return userService.requireActive(authentication.token.subject).id
+        return authentication.token.subject.also(userQueryService::requireActive)
     }
 }
