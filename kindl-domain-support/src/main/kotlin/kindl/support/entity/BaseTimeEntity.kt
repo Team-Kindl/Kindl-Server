@@ -6,7 +6,7 @@ import org.springframework.data.annotation.LastModifiedDate
 import java.time.Instant
 
 /**
- * 계속 갱신되지만 지울 일은 없는 테이블용 (promise_daily_records, outbox_events).
+ * 계속 갱신되지만 지울 일은 없는 테이블용 (promise_daily_records).
  */
 @MappedSuperclass
 abstract class BaseTimeEntity : BaseCreatedEntity() {

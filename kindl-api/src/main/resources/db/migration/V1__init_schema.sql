@@ -259,20 +259,3 @@ CREATE TABLE reports (
     UNIQUE KEY uk_report (verification_id, reporter_user_id, active),
     KEY ix_report_status (status, id)
 );
-
--- ========== support ==========
-CREATE TABLE outbox_events (
-    id              BIGINT       NOT NULL,
-    aggregate_type  VARCHAR(30)  NOT NULL COMMENT '예: USER',
-    aggregate_id    VARCHAR(13)  NOT NULL,
-    event_type      VARCHAR(40)  NOT NULL COMMENT '예: UNLINK_SOCIAL',
-    payload         JSON         NOT NULL,
-    status          VARCHAR(20)  NOT NULL,
-    attempts        TINYINT      NOT NULL DEFAULT 0,
-    next_attempt_at DATETIME(6)  NOT NULL,
-    last_error      VARCHAR(500) NULL,
-    created_at      DATETIME(6)  NOT NULL,
-    updated_at      DATETIME(6)  NOT NULL,
-    PRIMARY KEY (id),
-    KEY ix_outbox_due (status, next_attempt_at) -- SELECT … FOR UPDATE SKIP LOCKED
-);

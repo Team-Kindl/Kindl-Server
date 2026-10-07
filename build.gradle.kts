@@ -6,7 +6,6 @@ plugins {
     kotlin("plugin.jpa") version "2.3.21" apply false
     id("org.springframework.boot") version "4.0.6" apply false
     id("io.spring.dependency-management") version "1.1.7" apply false
-    id("com.google.devtools.ksp") version "2.3.7" apply false
 }
 
 val kotlinVersion = "2.3.21"
@@ -20,7 +19,7 @@ allprojects {
     }
 }
 
-// 도메인 모듈 공통: JPA 엔티티 + QueryDSL Q클래스 생성
+// 도메인 모듈 공통: JPA 엔티티
 val domainModules = setOf(
     "kindl-domain-support",
     "kindl-domain-user",
@@ -76,7 +75,6 @@ subprojects {
 
     if (name in domainModules) {
         apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
-        apply(plugin = "com.google.devtools.ksp")
 
         configure<org.jetbrains.kotlin.allopen.gradle.AllOpenExtension> {
             annotation("jakarta.persistence.Entity")
@@ -86,8 +84,6 @@ subprojects {
 
         dependencies {
             "api"("org.springframework.boot:spring-boot-starter-data-jpa")
-            "api"("io.github.openfeign.querydsl:querydsl-jpa:7.0")
-            "ksp"("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.0")
         }
     }
 }
