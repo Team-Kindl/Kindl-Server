@@ -1,5 +1,6 @@
 package kindl.domain.promise.repository
 
+import kindl.domain.promise.dto.projection.PromiseCountProjection
 import kindl.domain.promise.entity.Promise
 import kindl.domain.promise.enums.PromiseStatus
 import org.springframework.data.jpa.repository.JpaRepository
@@ -49,11 +50,5 @@ interface PromiseRepository : JpaRepository<Promise, String> {
         group by p.roomId, p.userId
         """,
     )
-    fun countByRoomAndUser(roomIds: Collection<String>, status: PromiseStatus): List<PromiseCount>
-
-    interface PromiseCount {
-        val roomId: String
-        val userId: String
-        val count: Long
-    }
+    fun countByRoomAndUser(roomIds: Collection<String>, status: PromiseStatus): List<PromiseCountProjection>
 }

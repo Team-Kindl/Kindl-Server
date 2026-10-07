@@ -14,7 +14,7 @@ import kindl.api.room.facade.RoomFacade
 import kindl.api.security.CurrentUser
 import kindl.core.time.ServiceClock
 import kindl.domain.room.enums.RoomStatus
-import kindl.domain.room.service.RoomService
+import kindl.domain.room.service.RoomCommandService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/rooms")
 class RoomController(
-    private val roomService: RoomService,
+    private val roomCommandService: RoomCommandService,
     private val roomFacade: RoomFacade,
     private val clock: ServiceClock,
 ) {
@@ -41,7 +41,7 @@ class RoomController(
         @RequestHeader(IDEMPOTENCY_KEY) idempotencyKey: UUID,
         @Valid @RequestBody request: CreateRoomRequest,
     ): ResponseEntity<SuccessResponse<RoomResponse>> {
-        val room = roomService.create(request.toCommand(userId, idempotencyKey), clock.now())
+        val room = roomCommandService.create(request.toCommand(userId, idempotencyKey), clock.now())
         return SuccessResponse.of(RoomResponse.from(room), HttpStatus.CREATED, "CREATED")
     }
 

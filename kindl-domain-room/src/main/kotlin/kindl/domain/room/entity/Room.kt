@@ -112,6 +112,9 @@ class Room private constructor(
     companion object {
         const val CAPACITY = 10
 
+        // 한 사람이 동시에 참여할 수 있는 진행 중 모임 수
+        const val MAX_ROOMS_PER_USER = 10L
+
         // 만든 사람이 첫 멤버(모임장)다
         fun create(name: RoomName, ownerUserId: String, inviteCode: InviteCode, clientRequestId: String) =
             Room(name, inviteCode, ownerUserId, clientRequestId)

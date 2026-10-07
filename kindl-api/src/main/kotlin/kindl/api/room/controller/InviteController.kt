@@ -7,7 +7,7 @@ import kindl.api.room.dto.response.JoinRoomResponse
 import kindl.api.room.facade.RoomFacade
 import kindl.api.security.CurrentUser
 import kindl.core.time.ServiceClock
-import kindl.domain.room.service.RoomService
+import kindl.domain.room.service.RoomCommandService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/invites")
 class InviteController(
     private val roomFacade: RoomFacade,
-    private val roomService: RoomService,
+    private val roomCommandService: RoomCommandService,
     private val rateLimiter: RateLimiter,
     private val clock: ServiceClock,
 ) {
@@ -39,7 +39,7 @@ class InviteController(
         @PathVariable code: String,
     ): ResponseEntity<SuccessResponse<JoinRoomResponse>> {
         rateLimiter.check(rateKey(userId), LIMIT_PER_MINUTE)
-        val room = roomService.join(code, userId, clock.now())
+        val room = roomCommandService.join(code, userId, clock.now())
         return SuccessResponse.of(JoinRoomResponse(room.roomId, room.name))
     }
 

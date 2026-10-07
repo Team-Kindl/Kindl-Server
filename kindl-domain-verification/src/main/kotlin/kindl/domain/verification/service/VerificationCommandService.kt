@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
 @Service
-class VerificationService(
+class VerificationCommandService(
     private val verifications: VerificationRepository,
     private val items: VerificationItemRepository,
     private val cheers: CheerRepository,
@@ -29,16 +29,4 @@ class VerificationService(
         }
         cheers.softDeleteAllSentInRoom(roomId, userId, now)
     }
-
-    /** 나가기 시트 안내 숫자: 이 모임의 내 인증 수 · 받은 응원 수 */
-    @Transactional(readOnly = true)
-    fun recordOf(roomId: String, userId: String): MemberRecord = MemberRecord(
-        verificationCount = verifications.countByRoomIdAndUserId(roomId, userId).toInt(),
-        receivedCheerCount = cheers.countReceivedInRoom(roomId, userId).toInt(),
-    )
 }
-
-data class MemberRecord(
-    val verificationCount: Int,
-    val receivedCheerCount: Int,
-)
