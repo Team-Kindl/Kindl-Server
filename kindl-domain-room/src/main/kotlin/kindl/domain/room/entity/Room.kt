@@ -11,6 +11,7 @@ import kindl.core.error.KindlException
 import kindl.domain.room.enums.RoomStatus
 import kindl.domain.room.error.RoomError
 import kindl.domain.room.vo.InviteCode
+import kindl.domain.room.vo.RoomName
 import kindl.support.entity.BaseSoftDeleteEntity
 import kindl.support.id.TsidId
 import org.hibernate.annotations.JdbcTypeCode
@@ -21,9 +22,10 @@ import org.hibernate.type.SqlTypes
 @Table(name = "rooms")
 @SQLRestriction("deleted_at IS NULL")
 class Room private constructor(
-    name: String,
+    name: RoomName,
     inviteCode: InviteCode,
     ownerUserId: String,
+    clientRequestId: String,
 ) : BaseSoftDeleteEntity() {
 
     @Id @TsidId
@@ -33,7 +35,7 @@ class Room private constructor(
 
     // 규칙은 그래핌 15개, 컬럼 길이는 상한 안전망
     @Column(nullable = false, length = 60)
-    var name: String = name
+    var name: String = name.value
         protected set
 
     @Column(length = 13)
@@ -66,11 +68,29 @@ class Room private constructor(
     var finalAvgRate: Int? = null
         protected set
 
+    // 앱이 만든 Idempotency-Key. 버튼 연타·재시도에도 모임이 하나만 생기게
+    @Column(length = 36, updatable = false)
+    val clientRequestId: String? = clientRequestId
+
+    val isEnded: Boolean get() = status == RoomStatus.ENDED
+
+    fun isOwnedBy(userId: String): Boolean = ownerUserId == userId
+
+    fun requireOwner(userId: String) {
+        if (!isOwnedBy(userId)) throw KindlException(RoomError.OWNER_ONLY)
+    }
+
+    fun requireActive() {
+        if (isEnded) throw KindlException(RoomError.ROOM_ENDED)
+    }
+
     fun addMember() {
-        if (status == RoomStatus.ENDED) throw KindlException(RoomError.ROOM_ENDED)
-        if (memberCount >= CAPACITY) throw KindlException(RoomError.ROOM_FULL)
+        requireActive()
+        if (isFull) throw KindlException(RoomError.ROOM_FULL)
         memberCount++
     }
+
+    val isFull: Boolean get() = memberCount >= CAPACITY
 
     fun removeMember() {
         check(memberCount > 0) { "멤버 수가 0보다 작아질 수 없습니다." }
@@ -81,8 +101,9 @@ class Room private constructor(
         ownerUserId = userId
     }
 
-    fun end(avgRate: Int, now: Instant) {
-        if (status == RoomStatus.ENDED) return
+    /** 평균 스냅샷은 공약 달성률 계산이 붙으면 채운다 */
+    fun end(now: Instant, avgRate: Int? = null) {
+        requireActive()
         status = RoomStatus.ENDED
         endedAt = now
         finalAvgRate = avgRate
@@ -91,7 +112,11 @@ class Room private constructor(
     companion object {
         const val CAPACITY = 10
 
+        // 한 사람이 동시에 참여할 수 있는 진행 중 모임 수
+        const val MAX_ROOMS_PER_USER = 10L
+
         // 만든 사람이 첫 멤버(모임장)다
-        fun create(name: String, ownerUserId: String, inviteCode: InviteCode) = Room(name, inviteCode, ownerUserId)
+        fun create(name: RoomName, ownerUserId: String, inviteCode: InviteCode, clientRequestId: String) =
+            Room(name, inviteCode, ownerUserId, clientRequestId)
     }
 }

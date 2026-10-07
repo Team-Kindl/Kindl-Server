@@ -17,6 +17,8 @@ spring:
 
 server:
   shutdown: graceful
+  # Nginx 뒤에서 X-Forwarded-For로 실제 클라이언트 IP를 읽는다 (IP 기준 호출 제한)
+  forward-headers-strategy: native
   tomcat:
     threads:
       max: 50

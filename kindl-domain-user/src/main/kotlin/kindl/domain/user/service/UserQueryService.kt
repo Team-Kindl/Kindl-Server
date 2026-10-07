@@ -4,6 +4,7 @@ import kindl.core.error.KindlException
 import kindl.core.extension.orThrow
 import kindl.domain.user.dto.result.NicknameAvailability
 import kindl.domain.user.dto.result.UserResult
+import kindl.domain.user.dto.result.UserSummary
 import kindl.domain.user.error.UserError
 import kindl.domain.user.repository.UserRepository
 import kindl.domain.user.vo.Nickname
@@ -40,4 +41,8 @@ class UserQueryService(
     fun requireActive(userId: String) {
         if (!users.existsById(userId)) throw KindlException(UserError.USER_NOT_FOUND)
     }
+
+    /** 살아 있는 유저만 돌려준다. 탈퇴한 유저는 맵에 없다 */
+    fun summaries(userIds: Collection<String>): Map<String, UserSummary> =
+        if (userIds.isEmpty()) emptyMap() else users.findAllById(userIds).associate { requireNotNull(it.id) to UserSummary.from(it) }
 }

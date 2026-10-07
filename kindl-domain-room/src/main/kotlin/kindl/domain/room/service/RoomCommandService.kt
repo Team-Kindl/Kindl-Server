@@ -1,0 +1,132 @@
+package kindl.domain.room.service
+
+import kindl.core.error.CommonError
+import kindl.core.error.KindlException
+import kindl.core.extension.orThrow
+import kindl.domain.room.dto.command.CreateRoomCommand
+import kindl.domain.room.dto.result.LeaveResult
+import kindl.domain.room.dto.result.RoomResult
+import kindl.domain.room.entity.Room
+import kindl.domain.room.entity.RoomBan
+import kindl.domain.room.entity.RoomMember
+import kindl.domain.room.enums.MemberRole
+import kindl.domain.room.enums.RoomStatus
+import kindl.domain.room.error.RoomError
+import kindl.domain.room.repository.RoomBanRepository
+import kindl.domain.room.repository.RoomMemberRepository
+import kindl.domain.room.repository.RoomRepository
+import kindl.domain.room.vo.InviteCode
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+
+@Service
+class RoomCommandService(
+    private val rooms: RoomRepository,
+    private val members: RoomMemberRepository,
+    private val bans: RoomBanRepository,
+) {
+    /**
+     * 같은 Idempotency-Key면 처음 만든 모임을 그대로 돌려준다 (연타·네트워크 재시도).
+     * 키가 모임 행과 같은 트랜잭션에 저장되므로, 응답 전에 서버가 죽어도 재시도가 모임을 하나 더 만들지 않는다.
+     */
+    @Transactional
+    fun create(command: CreateRoomCommand, now: Instant): RoomResult {
+        rooms.findByClientRequestId(command.clientRequestId)?.let { return RoomResult.from(it) }
+        requireRoomSlot(command.userId)
+        val room = rooms.save(Room.create(command.name, command.userId, newInviteCode(), command.clientRequestId))
+        members.save(RoomMember.owner(requireNotNull(room.id), command.userId, now))
+        return RoomResult.from(room)
+    }
+
+    /**
+     * 모임 행을 잠근 채(FOR UPDATE) 차단·종료·정원·내 모임 수를 확인하고 인원을 늘린다.
+     * 동시에 여러 명이 눌러도 확인과 증가 사이에 끼어들 수 없어 정원을 넘지 않는다.
+     * 같은 사람이 두 기기로 동시에 누르면 uk_member가 마지막에 막는다(→ ALREADY_JOINED).
+     */
+    @Transactional
+    fun join(rawCode: String, userId: String, now: Instant): RoomResult {
+        val code = InviteCode.parse(rawCode).orThrow(RoomError.INVITE_NOT_FOUND)
+        val room = rooms.findByInviteCodeForUpdate(code.value).orThrow(RoomError.INVITE_NOT_FOUND)
+        val roomId = requireNotNull(room.id)
+        if (members.existsByRoomIdAndUserId(roomId, userId)) throw KindlException(RoomError.ALREADY_JOINED)
+        if (bans.existsByRoomIdAndUserId(roomId, userId)) throw KindlException(RoomError.BANNED_FROM_ROOM)
+        room.addMember()
+        requireRoomSlot(userId)
+        members.saveAndFlush(RoomMember.member(roomId, userId, now))
+        return RoomResult.from(room)
+    }
+
+    /** 멤버 행만 다룬다. 그 모임의 내 공약·인증 삭제는 Facade가 같은 트랜잭션에서 이어서 한다 */
+    @Transactional
+    fun leave(roomId: String, userId: String, now: Instant): LeaveResult {
+        val room = lockRoom(roomId)
+        val me = members.findByRoomIdAndUserId(roomId, userId).orThrow(CommonError.RESOURCE_NOT_FOUND)
+        return removeMember(room, me, now)
+    }
+
+    @Transactional
+    fun kick(roomId: String, ownerUserId: String, targetUserId: String, now: Instant) {
+        val room = lockRoom(roomId)
+        requireMember(roomId, ownerUserId)
+        room.requireOwner(ownerUserId)
+        room.requireActive()
+        if (ownerUserId == targetUserId) throw KindlException(RoomError.CANNOT_KICK_SELF)
+        val target = members.findByRoomIdAndUserId(roomId, targetUserId).orThrow(CommonError.RESOURCE_NOT_FOUND)
+        removeMember(room, target, now)
+        bans.save(RoomBan.of(roomId, targetUserId, ownerUserId))
+    }
+
+    /** 종료하고 멤버 목록을 돌려준다. 멤버들의 진행 중 공약 마감은 Facade가 이어서 한다 */
+    @Transactional
+    fun end(roomId: String, userId: String, now: Instant): Pair<RoomResult, List<String>> {
+        val room = lockRoom(roomId)
+        requireMember(roomId, userId)
+        room.requireOwner(userId)
+        room.end(now)
+        return RoomResult.from(room) to members.findAllByRoomIdOrderByJoinedAtAsc(roomId).map { it.userId }
+    }
+
+    private fun removeMember(room: Room, member: RoomMember, now: Instant): LeaveResult {
+        val roomId = requireNotNull(room.id)
+        member.softDelete(now)
+        room.removeMember()
+        if (member.role != MemberRole.OWNER) return LeaveResult(roomDeleted = false, newOwnerUserId = null)
+
+        val next = members.findFirstByRoomIdAndUserIdNotOrderByJoinedAtAsc(roomId, member.userId)
+        if (next == null) {
+            room.softDelete(now)
+            return LeaveResult(roomDeleted = true, newOwnerUserId = null)
+        }
+        next.promoteToOwner()
+        room.handOverTo(next.userId)
+        return LeaveResult(roomDeleted = false, newOwnerUserId = next.userId)
+    }
+
+    // 존재 여부를 알려 주지 않으려고 403 대신 404
+    private fun lockRoom(roomId: String): Room =
+        rooms.findByIdForUpdate(roomId).orThrow(CommonError.RESOURCE_NOT_FOUND)
+
+    private fun requireMember(roomId: String, userId: String) {
+        if (!members.existsByRoomIdAndUserId(roomId, userId)) throw KindlException(CommonError.RESOURCE_NOT_FOUND)
+    }
+
+    private fun requireRoomSlot(userId: String) {
+        if (members.countByUserIdAndRoomStatus(userId, RoomStatus.ACTIVE) >= Room.MAX_ROOMS_PER_USER) {
+            throw KindlException(RoomError.ROOM_LIMIT_EXCEEDED)
+        }
+    }
+
+    // 32^8 ≈ 1.1조라 충돌은 드물지만 0이 아니다. 지워진 모임의 코드까지 피해서 다시 뽑는다
+    private fun newInviteCode(): InviteCode {
+        repeat(INVITE_CODE_ATTEMPTS) {
+            val code = InviteCode.generate()
+            if (rooms.countByInviteCodeIncludingDeleted(code.value) == 0L) return code
+        }
+        throw KindlException(CommonError.CONFLICT_STATE, "초대 코드 생성 실패")
+    }
+
+    companion object {
+        private const val INVITE_CODE_ATTEMPTS = 3
+    }
+}
