@@ -1,9 +1,11 @@
 package kindl.api.user.controller
 
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import kindl.api.auth.dto.response.TokenResponse
 import kindl.api.auth.facade.AuthFacade
+import kindl.api.common.ratelimit.RateLimiter
 import kindl.api.common.response.SuccessResponse
 import kindl.api.security.CurrentUser
 import kindl.api.user.dto.request.SignupRequest
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val authFacade: AuthFacade,
     private val userQueryService: UserQueryService,
+    private val rateLimiter: RateLimiter,
 ) {
     /** signupToken + 익명 프로필로 유저를 만들고 바로 토큰을 준다. */
     @PostMapping("/users")
@@ -43,6 +46,14 @@ class UserController(
     @GetMapping("/nicknames/availability")
     fun checkNickname(
         @RequestParam @Size(max = 60) value: String,
-    ): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>> =
-        SuccessResponse.of(NicknameAvailabilityResponse.from(userQueryService.checkNickname(value)))
+        request: HttpServletRequest,
+    ): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>> {
+        // 300ms 디바운스로 쉬지 않고 쳐도 분당 30회 안쪽. 그 이상은 닉네임 목록을 긁는 스크립트로 본다
+        rateLimiter.check("nickname:${request.remoteAddr}", NICKNAME_CHECK_PER_MINUTE)
+        return SuccessResponse.of(NicknameAvailabilityResponse.from(userQueryService.checkNickname(value)))
+    }
+
+    companion object {
+        private const val NICKNAME_CHECK_PER_MINUTE = 30
+    }
 }
