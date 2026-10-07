@@ -3,6 +3,7 @@ package kindl.api.room.controller
 import jakarta.validation.Valid
 import java.util.UUID
 import kindl.api.common.response.SuccessResponse
+import kindl.api.common.validation.ValidEnum
 import kindl.api.room.dto.request.CreateRoomRequest
 import kindl.api.room.dto.response.EndRoomResponse
 import kindl.api.room.dto.response.LeaveRoomResponse
@@ -12,6 +13,7 @@ import kindl.api.room.dto.response.RoomDetailResponse
 import kindl.api.room.dto.response.RoomResponse
 import kindl.api.room.facade.RoomFacade
 import kindl.api.security.CurrentUser
+import kindl.core.extension.toEnumIgnoreCase
 import kindl.core.time.ServiceClock
 import kindl.domain.room.enums.RoomStatus
 import kindl.domain.room.service.RoomCommandService
@@ -48,9 +50,9 @@ class RoomController(
     @GetMapping
     fun myRooms(
         @CurrentUser userId: String,
-        @RequestParam(defaultValue = "ACTIVE") status: RoomStatus,
+        @RequestParam(defaultValue = "ACTIVE") @ValidEnum(RoomStatus::class) status: String,
     ): ResponseEntity<SuccessResponse<MyRoomsResponse>> =
-        SuccessResponse.of(roomFacade.myRooms(userId, status))
+        SuccessResponse.of(roomFacade.myRooms(userId, status.toEnumIgnoreCase()))
 
     @GetMapping("/{roomId}")
     fun detail(
