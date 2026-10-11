@@ -13,6 +13,7 @@ spring:
 
 server:
   shutdown: graceful
+  forward-headers-strategy: native
   tomcat:
     threads:
       max: 50

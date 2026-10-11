@@ -1,5 +1,6 @@
 package proov.api.controller.user
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import proov.api.common.ratelimit.RateLimiter
 import proov.api.common.resolver.CurrentUserId
 import proov.api.common.response.ResponseFactory
 import proov.api.common.response.SuccessResponse
@@ -22,6 +24,7 @@ import proov.domain.user.service.UserQueryService
 class UserController(
     private val authFacade: AuthFacade,
     private val userQueryService: UserQueryService,
+    private val rateLimiter: RateLimiter,
 ) : UserApi {
 
     @PostMapping("/users")
@@ -35,6 +38,13 @@ class UserController(
     @GetMapping("/nicknames/availability")
     override fun checkNickname(
         @RequestParam value: String,
-    ): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>> =
-        ResponseFactory.success(UserSuccessCode.CHECK_NICKNAME, NicknameAvailabilityResponse.from(userQueryService.checkNickname(value)))
+        request: HttpServletRequest,
+    ): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>> {
+        rateLimiter.check("nickname:${request.remoteAddr}", NICKNAME_CHECK_PER_MINUTE)
+        return ResponseFactory.success(UserSuccessCode.CHECK_NICKNAME, NicknameAvailabilityResponse.from(userQueryService.checkNickname(value)))
+    }
+
+    companion object {
+        private const val NICKNAME_CHECK_PER_MINUTE = 30
+    }
 }

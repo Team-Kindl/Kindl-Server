@@ -6,6 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
+import org.springframework.web.bind.ServletRequestBindingException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.HandlerMethodValidationException
@@ -46,6 +47,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(
         MethodArgumentTypeMismatchException::class,
         MissingServletRequestParameterException::class,
+        ServletRequestBindingException::class,
         HttpMessageNotReadableException::class,
     )
     fun handleBadRequest(e: Exception): ResponseEntity<FailureResponse> {
