@@ -5,4 +5,5 @@ include(
     "domain:domain-user",
     "domain:domain-auth",
     "storage",
+    "clients",
 )
