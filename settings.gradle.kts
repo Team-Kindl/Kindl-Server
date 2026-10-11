@@ -6,4 +6,5 @@ include(
     "domain:domain-auth",
     "storage",
     "clients",
+    "api",
 )
