@@ -10,6 +10,7 @@ enum class CommonFailure(
     FORBIDDEN(403, "권한이 없어요"),
     NOT_FOUND(404, "찾을 수 없어요"),
     METHOD_NOT_ALLOWED(405, "지원하지 않는 요청 방식이에요"),
+    RATE_LIMITED(429, "요청이 너무 많아요. 잠시 후 다시 시도해 주세요"),
     INTERNAL_ERROR(500, "잠시 후 다시 시도해 주세요"),
     ;
 

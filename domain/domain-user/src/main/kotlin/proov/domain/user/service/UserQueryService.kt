@@ -25,6 +25,9 @@ class UserQueryService(
 
     fun getById(userId: String): User = userRepositoryPort.findById(userId).orThrow(UserFailure.USER_NOT_FOUND)
 
+    fun getAllByIds(userIds: Collection<String>): List<User> =
+        if (userIds.isEmpty()) emptyList() else userRepositoryPort.findAllByIds(userIds)
+
     fun requireExists(userId: String) {
         if (!userRepositoryPort.existsById(userId)) throw ProovException(UserFailure.USER_NOT_FOUND)
     }

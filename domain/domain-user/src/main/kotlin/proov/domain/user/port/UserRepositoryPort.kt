@@ -7,6 +7,8 @@ interface UserRepositoryPort {
 
     fun findById(userId: String): User?
 
+    fun findAllByIds(userIds: Collection<String>): List<User>
+
     fun existsById(userId: String): Boolean
 
     fun existsByNicknameKey(nicknameKey: String): Boolean

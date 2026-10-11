@@ -3,6 +3,7 @@ package proov.api.controller.user
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import org.springframework.http.ResponseEntity
@@ -22,5 +23,8 @@ interface UserApi {
     fun me(@Parameter(hidden = true) userId: String): ResponseEntity<SuccessResponse<MeResponse>>
 
     @Operation(summary = "닉네임 사용 가능 여부")
-    fun checkNickname(@Size(max = 60) value: String): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>>
+    fun checkNickname(
+        @Size(max = 60) value: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<SuccessResponse<NicknameAvailabilityResponse>>
 }

@@ -23,6 +23,9 @@ class UserRepositoryAdapter(
 
     override fun findById(userId: String): User? = userJpaRepository.findByIdOrNull(userId)?.toDomain()
 
+    override fun findAllByIds(userIds: Collection<String>): List<User> =
+        userJpaRepository.findAllById(userIds).map(UserEntity::toDomain)
+
     override fun existsById(userId: String): Boolean = userJpaRepository.existsById(userId)
 
     override fun existsByNicknameKey(nicknameKey: String): Boolean = userJpaRepository.existsByNicknameKey(nicknameKey)
