@@ -1,79 +1,65 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("jvm") version "2.3.21"
-    kotlin("plugin.spring") version "2.3.21"
-    kotlin("plugin.jpa") version "2.3.21"
-    id("org.springframework.boot") version "4.0.6"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("com.google.devtools.ksp") version "2.3.7"
+    kotlin("jvm") version "2.3.21" apply false
+    kotlin("plugin.spring") version "2.3.21" apply false
+    kotlin("plugin.jpa") version "2.3.21" apply false
+    id("org.springframework.boot") version "4.0.6" apply false
+    id("io.spring.dependency-management") version "1.1.7" apply false
+    id("com.google.devtools.ksp") version "2.3.7" apply false
 }
 
-group = "kindl"
-version = "0.0.1-SNAPSHOT"
+val kotlinVersion = "2.3.21"
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+allprojects {
+    group = "proov"
+    version = "0.0.1-SNAPSHOT"
+
+    repositories {
+        mavenCentral()
     }
 }
 
-repositories {
-    mavenCentral()
-}
+configure(subprojects.filter { it.childProjects.isEmpty() }) {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "java-library")
 
-dependencies {
-    // JPA
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
-    // Spring Boot
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("tools.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    // MySQL
-    runtimeOnly("com.mysql:mysql-connector-j")
-
-    // QueryDSL
-    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
-    ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.0")
-
-    // Validation
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
-    // Monitoring
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    // Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
-
-    // Security
-    implementation("org.springframework.boot:spring-boot-starter-security")
-
-    // Redis
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
-    // JWT
-    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
-
-    // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
+    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) {
+                bomProperty("kotlin.version", kotlinVersion)
+            }
+        }
     }
-}
 
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
-}
+    configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+    configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
+        compilerOptions {
+            freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+            jvmTarget = JvmTarget.JVM_21
+        }
+    }
+
+    dependencies {
+        "implementation"("org.jetbrains.kotlin:kotlin-reflect")
+
+        "testImplementation"("org.springframework.boot:spring-boot-starter-test")
+        "testImplementation"("io.kotest:kotest-runner-junit5:5.9.1")
+        "testImplementation"("io.kotest:kotest-assertions-core:5.9.1")
+        "testImplementation"("io.kotest:kotest-framework-datatest:5.9.1")
+        "testImplementation"("io.mockk:mockk:1.13.13")
+        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
+        systemProperty("user.timezone", "UTC")
+    }
 }

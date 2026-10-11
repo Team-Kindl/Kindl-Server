@@ -1,1 +1,5 @@
-rootProject.name = "kindl-server"
+rootProject.name = "proov-server"
+
+include(
+    "core",
+)
