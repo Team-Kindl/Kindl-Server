@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+proov:
+  jwt:
+    access-key: test-access-key-for-testing-only-min-32-bytes
+    signup-key: test-signup-key-for-testing-only-min-32-bytes
+  oauth:
+    enabled: false
