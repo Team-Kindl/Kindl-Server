@@ -4,4 +4,5 @@ include(
     "core",
     "domain:domain-user",
     "domain:domain-auth",
+    "storage",
 )
