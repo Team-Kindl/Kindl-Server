@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: proov
+  config:
+    import:
+      - classpath:storage.yml
+      - classpath:security.yml
+      - classpath:external.yml
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  jackson:
+    time-zone: UTC
+
+server:
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 50
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
