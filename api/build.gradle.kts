@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain:domain-user"))
     implementation(project(":domain:domain-auth"))
+    implementation(project(":domain:domain-room"))
     implementation(project(":storage"))
     implementation(project(":clients"))
 
